@@ -7,7 +7,7 @@ import requests
 import confuse
 import subprocess
 
-mandatory_config_values = ['regexps', 'rss']
+mandatory_config_values = ['regexps', 'rss', 'torrentFileDirectory']
 
 def load_configuration():
     config = confuse.Configuration('torrent-processor', __name__)
@@ -37,16 +37,16 @@ def get_filename_from_cd(cd):
         return None
     return fname[0]
 
-def is_duplicate(filename):
+def is_duplicate(filename, torrent_file_directory):
     duplicate = False
-    for file in scandir('.'):
+    for file in scandir(torrent_file_directory):
         if file.is_file and file.name == filename:
             print('SKIP_ALREADY_DOWNLOADED_TORRENTFILE - ' + filename)
             duplicate = True
 
     return duplicate
 
-def download_torrent_file(url, title):
+def download_torrent_file(url, title, torrent_file_directory):
     filename = None
     downloaded = False
 
@@ -55,11 +55,11 @@ def download_torrent_file(url, title):
         filename = get_filename_from_cd(r.headers.get('content-disposition'))
         if not filename:
             print('ERROR_DOWNLOAD_TORRENTFILE_NO_FILENAME - ' + title)
-        elif not is_duplicate(filename):
+        elif not is_duplicate(filename, torrent_file_directory):
             print('DOWNLOAD_STARTED_TORRENTFILE - ' + filename)
             torrent_file = None
             try:
-                torrent_file = open(filename, 'wb')
+                torrent_file = open(torrent_file_directory + '/' + filename, 'wb')
                 torrent_file.write(r.content)
                 downloaded = True
             except IOError:
@@ -72,9 +72,9 @@ def download_torrent_file(url, title):
 
     return filename, downloaded
 
-def download_torrent(filename):
+def download_torrent(filename, torrent_file_directory):
     try:
-        download_process = subprocess.run(['transmission-remote', 'localhost:9091', '--add', filename], stdout=subprocess.PIPE)
+        download_process = subprocess.run(['transmission-remote', 'localhost:9091', '--add', torrent_file_directory + '/' + filename], stdout=subprocess.PIPE)
         if download_process.returncode != 0:
             print('ERROR_DOWNLOADING_TORRENT - ' + download_process.stdout)
         else:
@@ -91,6 +91,8 @@ def main():
     if not root:
         return
 
+    torrent_file_directory = config['torrentFileDirectory'].get()
+
     regexp_list = config['regexps'].get()
     for item in root.findall('.*/item'):
         title = item.findtext('title')
@@ -98,9 +100,9 @@ def main():
             if re.match(regexp, title):
                 print('MATCH - ' + title)
                 url = item.findtext('link')
-                filename, downloaded = download_torrent_file(url, title)
+                filename, downloaded = download_torrent_file(url, title, torrent_file_directory)
                 if downloaded:
-                    download_torrent(filename)
+                    download_torrent(filename, torrent_file_directory)
 
 if __name__ == "__main__":
     main()

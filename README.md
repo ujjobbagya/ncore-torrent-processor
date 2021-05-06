@@ -18,4 +18,5 @@ regexps:
 - Resident\.Alien.*720p.*
 - The\.Good\.Doctor.*720p.*
 - Doc\.in\.Your\.Hands.*
+torrentFileDirectory: /Users/aujjobba/dev/python
 ```
