@@ -41,7 +41,7 @@ def is_duplicate(filename):
     duplicate = False
     for file in scandir('.'):
         if file.is_file and file.name == filename:
-            print('SKIP_ALREADY_DOWNLOADED - ' + filename)
+            print('SKIP_ALREADY_DOWNLOADED_TORRENTFILE - ' + filename)
             duplicate = True
 
     return duplicate
@@ -54,21 +54,21 @@ def download_torrent_file(url, title):
     if r.status_code == 200:
         filename = get_filename_from_cd(r.headers.get('content-disposition'))
         if not filename:
-            print('ERROR_DOWNLOAD_NO_FILENAME - ' + title)
+            print('ERROR_DOWNLOAD_TORRENTFILE_NO_FILENAME - ' + title)
         elif not is_duplicate(filename):
-            print('DOWNLOAD_STARTED - ' + filename)
+            print('DOWNLOAD_STARTED_TORRENTFILE - ' + filename)
             torrent_file = None
             try:
                 torrent_file = open(filename, 'wb')
                 torrent_file.write(r.content)
                 downloaded = True
             except IOError:
-                print('ERROR_UNABLE_TO_WRITE - ' + filename)
+                print('ERROR_UNABLE_TO_WRITE_TORRENTFILE - ' + filename)
             finally:
                 if torrent_file:
                     torrent_file.close()     
     else:
-        print('ERROR_DOWNLOAD_' + str(r.status_code) + ' - ' + title + ' - ' + url)
+        print('ERROR_DOWNLOAD_TORRENTFILE_' + str(r.status_code) + ' - ' + title + ' - ' + url)
 
     return filename, downloaded
 
@@ -77,8 +77,10 @@ def download_torrent(filename):
         download_process = subprocess.run(['transmission-remote', 'localhost:9091', '--add', filename], stdout=subprocess.PIPE)
         if download_process.returncode != 0:
             print('ERROR_DOWNLOADING_TORRENT - ' + download_process.stdout)
+        else:
+            print('TORRENT_ADDED_TO_QUEUE - ' + filename)
     except Exception:
-            print('ERROR_DOWNLOADING_TORRENT - ' + filename)
+        print('ERROR_DOWNLOADING_TORRENT - ' + filename)
 
 def main():
     config = load_configuration()
