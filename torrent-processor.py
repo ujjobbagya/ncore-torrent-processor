@@ -63,7 +63,7 @@ def download_torrent_file(url, title, torrent_file_directory):
         raise DownloadTorrentFileException('ERROR_DOWNLOAD_TORRENTFILE_' + str(e))
 
     if r.status_code == 200:
-        filename = get_filename_from_cd(r.headers.get('content-dispositio'))
+        filename = get_filename_from_cd(r.headers.get('content-disposition'))
 
         if not is_duplicate(filename, torrent_file_directory):
             print('DOWNLOAD_STARTED_TORRENTFILE - ' + filename)
