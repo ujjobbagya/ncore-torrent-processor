@@ -1,7 +1,7 @@
 # ncore-torrent-processor
 This tool is intended to search torrent within a configured RSS, by using regular expressions, than add those to the queue.
 ## Limitations
-Currently only Transmission is supported, running on localhost:9091 without credentials, since the call of transmission-remote is hardcoded right now.  This suppose to change in the future.
+Currently only Transmission is supported, another tools can be integrated in the future.
 ## Config file
 The configuration file is in YAML format, must be placed as CONFIG_HOME/torrent-processor/config.yaml.  For more info about where the tool is searching for the config can be found at [Confuse's documentation](https://confuse.readthedocs.io/en/latest/usage.html#search-paths).
 ## Example configuration file
@@ -19,4 +19,10 @@ regexps:
 - The\.Good\.Doctor.*720p.*
 - Doc\.in\.Your\.Hands.*
 torrentFileDirectory: /Users/aujjobba/dev/python
+downloader: 
+  transmission:
+    host: localhost
+    port: 9091
+    username:
+    password:
 ```
