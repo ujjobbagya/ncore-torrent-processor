@@ -1,3 +1,4 @@
+import subprocess
 from exceptions.exceptions import DownloaderConfigurationException
 
 class Transmission:
@@ -8,7 +9,7 @@ class Transmission:
 
     def configure(self, configuration):
         try:
-            self.uri = str(configuration['host']) + ':' + str(configuration['port'])
+            self.uri = configuration['host'].get() + ':' + str(configuration['port'].get())
             username_config = configuration['username']
             password_config = configuration['password']
             if username_config.exists() and username_config.get() and password_config.exists() and password_config.get():
@@ -21,8 +22,11 @@ class Transmission:
         if self.username_password:
             command_array.extend(['-n', self.username_password])
         command_array.extend(['--add', torrent_file_path])
-
+        
         return command_array
+
+    def download_torrent(self, torrent_file_path):
+        return subprocess.run(self.construct_command_array(torrent_file_path), stdout=subprocess.PIPE)
 
     def get_configuration_name(self):
         return self.configuration_name

@@ -1,6 +1,5 @@
 from exceptions.exceptions import DownloaderNotFoundException
 from plugins.transmission import Transmission
-import plugins.transmission
 
 class DownloaderFactory:
 

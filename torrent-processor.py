@@ -1,13 +1,9 @@
 from exceptions.exceptions import ConfigurationException, DownloadTorrentException, DownloadTorrentFileException, RssLoadingException, TorrentProcessorException
-from os import close, scandir
-from pathlib import Path
+from os import scandir
 import xml.etree.ElementTree as ET
 import re
-from confuse.exceptions import NotFoundError
 import requests
 import confuse
-import subprocess
-import plugins.transmission as TM
 import downloaderfactory as DF
 
 mandatory_config_values = ['regexps', 'rss', 'torrentFileDirectory', 'downloader']
@@ -85,7 +81,7 @@ def download_torrent_file(url, title, torrent_file_directory):
 
 def download_torrent(filename, torrent_file_directory, downloader):
     try:
-        download_process = subprocess.run(downloader.construct_command_array(torrent_file_directory + '/' + filename), stdout=subprocess.PIPE)
+        download_process = downloader.download_torrent(torrent_file_directory + '/' + filename)
         if download_process.returncode != 0:
             raise DownloadTorrentException('ERROR_DOWNLOADING_TORRENT - ' + download_process.stdout)
         else:
